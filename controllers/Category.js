@@ -1,6 +1,6 @@
 const Tag = require("../models/Tag");
 
-exports.createTag = async (req, res) => {
+exports.createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
@@ -28,7 +28,7 @@ exports.createTag = async (req, res) => {
   }
 };
 
-exports.getAllTags = async (req, res) => {
+exports.getAllCategories = async (req, res) => {
   try {
     const allTags = await Tag.find({}, { name: true, description: true });
 
