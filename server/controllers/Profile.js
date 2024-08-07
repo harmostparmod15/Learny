@@ -1,34 +1,31 @@
 const Profile = require("../models/Profile")
 
 const User = require("../models/User")
+const { uploadImageToCloudinary } = require("../utils/imageUploader")
 
 
 exports.updateProfile = async (req, res) => {
+
     try {
         const {
-
+            firstName = "",
+            lastName = "",
             dateOfBirth = "",
             about = "",
-            contactNumber,
-            gender,
+            contactNumber = "",
+            gender = "",
         } = req.body
         const id = req.user.id
 
-        // data validation
-        if (!contactNumber || !gender || !id) {
-            return res
-                .status(404)
-                .json({
-                    success: false,
-                    message: "All Fields are Required"
-                })
-        }
-
         // Find the profile by id
         const userDetails = await User.findById(id)
-        const profileId = userDetails.additionalDetails;
-        const profile = await Profile.findById(profileId)
+        const profile = await Profile.findById(userDetails.additionalDetails)
 
+        const user = await User.findByIdAndUpdate(id, {
+            firstName,
+            lastName,
+        })
+        await user.save()
 
         // Update the profile fields
         profile.dateOfBirth = dateOfBirth
@@ -39,20 +36,22 @@ exports.updateProfile = async (req, res) => {
         // Save the updated profile
         await profile.save()
 
-
+        // Find the updated user details
+        const updatedUserDetails = await User.findById(id)
+            .populate("additionalDetails")
+            .exec()
 
         return res.json({
             success: true,
             message: "Profile updated successfully",
-            profile,
+            updatedUserDetails,
         })
     } catch (error) {
-        console.error("error in updateProfile controller ", error);
-        res.status(500).json({
+        console.log(error)
+        return res.status(500).json({
             success: false,
-            message: "Failed to update profile ",
             error: error.message,
-        });
+        })
     }
 }
 

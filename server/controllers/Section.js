@@ -55,11 +55,11 @@ exports.createSection = async (req, res) => {
 exports.updateSection = async (req, res) => {
     try {
         // data input
-        const { sectionName, sectionId, courseId } = req.body;
+        const { sectionName, sectionId } = req.body;
 
 
         // data validation 
-        if (!sectionName || !sectionId || !courseId) {
+        if (!sectionName || !sectionId) {
             return res.status(400).json({
                 success: false,
                 message: "All Fields are required",
@@ -103,6 +103,7 @@ exports.updateSection = async (req, res) => {
 exports.deleteSection = async (req, res) => {
     try {
 
+        // test with request.params
         const { sectionId } = req.params;
 
 

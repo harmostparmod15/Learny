@@ -63,7 +63,7 @@ exports.sendOTP = async (req, res) => {
 };
 
 // sign up user
-exports.signUp = async (req, res) => {
+exports.signup = async (req, res) => {
   try {
     const {
       firstName,
@@ -108,22 +108,22 @@ exports.signUp = async (req, res) => {
       });
     }
 
-    // find most recent otp of user
-    const recentOtp = await OTP.find({ email })
-      .sort({ createdAt: -1 })
-      .limit(-1);
 
-    // validate otp
-    if (recentOtp.length == 0) {
+    // Find the most recent OTP for the email
+    const response = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1)
+
+    if (response.length === 0) {
+      // OTP not found for the email
       return res.status(400).json({
         success: false,
-        message: "OTP not found",
-      });
-    } else if (otp !== recentOtp.otp) {
+        message: "The OTP is not valid",
+      })
+    } else if (otp !== response[0].otp) {
+      // Invalid OTP
       return res.status(400).json({
         success: false,
-        message: "OTP doesnt match ",
-      });
+        message: "The OTP is not valid",
+      })
     }
 
     // hash password
@@ -186,7 +186,7 @@ exports.login = async (req, res) => {
     }
 
     // password match from (db) and input wala
-    if (bcrypt.compareSync(password, existingUser.password)) {
+    if (bcrypt.compareSync(password, user.password)) {
       const payload = {
         email: user.email,
         id: user._id,
